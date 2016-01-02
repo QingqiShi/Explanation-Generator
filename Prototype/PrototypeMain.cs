@@ -1,7 +1,7 @@
-﻿using System;
-using ClangSharp;
+﻿
+using System;
 
-namespace ExplanationGenerator
+namespace ExplanationGenerator.Prototype
 {
     class PrototypeMain
     {
@@ -11,48 +11,14 @@ namespace ExplanationGenerator
         /// <param name="args">The command-line arguments.</param>
         public static void Run(string[] args)
         {
-            /* Create Index */
-            var index = new Index();
+            ClangWrapper cw = new ClangWrapper("src/main.c");
+            ClangWrapper.DumpAST(cw.getAST(), 0);
 
-            /* Clang Arguments */
-            string[] arg = new string[1] { "" };
+            Translator t = new Translator(cw);
+            ExplanationTree.DumpTree(t.Translate());
 
-            /* Create Translation Units */
-            TranslationUnit tu = index.CreateTranslationUnit("src/main.c", arg, null);
-
-            /* Creation Success */
-            if (tu != null)
-            {
-                /* Get Translation Unit Cursor */
-                Cursor cursor = tu.Cursor;
-
-                /* Visit Children */
-                DumpAST(cursor, 0);
-
-                /* Dispose Translation Unit */
-                tu.Dispose();
-            }
-
-            /* Dispose Index */
-            index.Dispose();
-
+            cw.Dispose();
             Console.ReadLine();
         }
-
-        static void DumpAST(Cursor rootCursor, int indent)
-        {
-            Console.WriteLine(rootCursor.Kind + " : " + rootCursor.Spelling);
-
-            foreach (var child in rootCursor.Children)
-            {
-                for (int i = 1; i < indent; i++)
-                {
-                    Console.Write("| ");
-                }
-                Console.Write("|- ");
-                DumpAST(child, indent + 1);
-            }
-        }
-
     }
 }

@@ -1,4 +1,6 @@
 ﻿
+using ExplanationGenerator.Prototype;
+
 namespace ExplanationGenerator
 {
     class Program
