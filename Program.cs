@@ -1,9 +1,11 @@
 ﻿
 using ExplanationGenerator.Prototype;
+using ExplanationGenerator.UnitTests;
+using NUnit.Framework;
 
 namespace ExplanationGenerator
 {
-    class Program
+    public class Program
     {
         /// <summary>
         /// Main Method
