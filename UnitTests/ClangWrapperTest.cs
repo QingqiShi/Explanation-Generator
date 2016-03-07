@@ -1,5 +1,5 @@
-﻿using NUnit.Framework;
-using System;
+﻿using ClangSharp;
+using NUnit.Framework;
 using System.IO;
 
 namespace ExplanationGenerator.UnitTests
@@ -13,32 +13,55 @@ namespace ExplanationGenerator.UnitTests
         }
 
         [Test]
-        public void testFileNameGetter()
+        public void testLoadFile()
         {
             ClangWrapper wrapper = new ClangWrapper();
-            wrapper.loadFile("func.c");
-            Assert.That(wrapper.getFileName(), Is.EqualTo("func.c"));
-        }
 
-        [Test]
-        public void testFileNameGetterNull()
-        {
-            ClangWrapper wrapper = new ClangWrapper();
-            Assert.That(wrapper.getFileName(), Is.EqualTo(null));
-        }
-
-        [Test]
-        public void testDumpAST()
-        {
-            // Create test file
-            string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".c";
-            using (StreamWriter sw = File.CreateText(fileName))
+            // Create temporary test file
+            string fileName = "func.c";
+            using (StreamWriter sw = System.IO.File.CreateText(fileName))
             {
                 sw.Write("Hello");
             }
 
+            // Load file
+            wrapper.loadFile("func.c");
+            // No exception, load success
+
+            wrapper.Dispose();
+            System.IO.File.Delete(fileName);
+        }
+
+        [Test]
+        public void testLoadFileFail()
+        {
             ClangWrapper wrapper = new ClangWrapper();
-            wrapper.loadFile(fileName);
+
+            Assert.Throws<FileNotFoundException>(delegate { wrapper.loadFile("nonExistingFile.c"); });
+        }
+
+        [Test]
+        public void testGetAstRoot()
+        {
+            ClangWrapper wrapper = new ClangWrapper();
+
+            // Create temporary test file
+            string fileName = "func.c";
+            using (StreamWriter sw = System.IO.File.CreateText(fileName))
+            {
+                sw.Write("int main() { return 0; }");
+            }
+
+            // Load file
+            wrapper.loadFile("func.c");
+
+            // Assert root kind and first child kind
+            Assert.AreEqual(CursorKind.TranslationUnit, wrapper.getRoot().Kind);
+            Assert.AreEqual(CursorKind.FunctionDecl, wrapper.getRoot().Children[0].Kind);
+            Assert.AreEqual("main", wrapper.getRoot().Children[0].Spelling);
+
+            wrapper.Dispose();
+            System.IO.File.Delete(fileName);
         }
     }
 }

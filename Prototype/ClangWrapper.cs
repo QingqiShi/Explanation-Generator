@@ -51,7 +51,7 @@ namespace ExplanationGenerator.Prototype
 
             foreach (var child in rootCursor.Children)
             {
-                for (int i = 1; i < indent; i++)
+                for (int i = 0; i < indent; i++)
                 {
                     Console.Write("| ");
                 }
