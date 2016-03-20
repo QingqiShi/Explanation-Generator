@@ -31,13 +31,19 @@ namespace ExplanationGenerator.UnitTests
             // Create temporary test files
             using (StreamWriter sw = System.IO.File.CreateText("en.lang"))
             {
-                sw.WriteLine("FunctionDecl::{0}{1}{2}{3}");
+                writeTemplate(sw);
             }
 
             using (StreamWriter sw = System.IO.File.CreateText("zh.lang"))
             {
-                sw.WriteLine("FunctionDecl::{0}{1}{2}{3}");
+                writeTemplate(sw);
             }
+        }
+
+        private void writeTemplate(StreamWriter sw)
+        {
+            sw.WriteLine("FunctionDecl::{0} {1} {2} [{3}]");
+            sw.WriteLine("ParmDecl::{0} {1}");
         }
 
         private void deleteTemplateFiles()
@@ -69,8 +75,9 @@ namespace ExplanationGenerator.UnitTests
             deleteTemplateFiles();
         }
 
-        [TestCase("en", "void func() { }", "[Function Declaration, function name: func[]]")]
-        [TestCase("zh", "void func() { }", "[函数声明，函数名：func[]]")]
+        [TestCase("en", "void func() { }", "func void () []")]
+        [TestCase("zh", "void func() { }", "func void () []")]
+        [TestCase("en", "void func(int a) { }", "func void [a ] []")]
         public void testTranslateFunctionDecl(string languageCode, string code, string expectedTranslation)
         {
             createTemplateFiles();
