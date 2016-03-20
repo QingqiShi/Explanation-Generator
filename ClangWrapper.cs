@@ -33,6 +33,14 @@ namespace ExplanationGenerator
             return _rootCursor;
         }
 
+        /*
+            Get translation unit
+        */
+        public TranslationUnit getTranslationUnit()
+        {
+            return tu;
+        }
+
         public void Dispose()
         {
             /* Dispose Translation Unit */

@@ -7,7 +7,7 @@ namespace ExplanationGenerator.UnitTests
     class TranslatorTest
     {
 
-        private Cursor getAST(string code)
+        private ClangWrapper getWrapper(string code)
         {
             ClangWrapper wrapper = new ClangWrapper();
 
@@ -23,7 +23,7 @@ namespace ExplanationGenerator.UnitTests
             
             System.IO.File.Delete(fileName);
 
-            return wrapper.getRoot();
+            return wrapper;
         }
 
         private void createTemplateFiles()
@@ -42,8 +42,16 @@ namespace ExplanationGenerator.UnitTests
 
         private void writeTemplate(StreamWriter sw)
         {
-            sw.WriteLine("FunctionDecl::{0} {1} {2} [{3}]");
+            sw.WriteLine("int::Int");
+            sw.WriteLine("char::Char");
+            sw.WriteLine("short int::Short");
+            sw.WriteLine("long int::Long");
+            sw.WriteLine("double::Double");
+            sw.WriteLine("float::Float");
+            sw.WriteLine("void::Void");
+            sw.WriteLine("FunctionDecl::{0} {1} |[{2}] |[{3}]");
             sw.WriteLine("ParmDecl::{0} {1}");
+            sw.WriteLine("VarDecl::{0} {1} {2}");
         }
 
         private void deleteTemplateFiles()
@@ -56,7 +64,7 @@ namespace ExplanationGenerator.UnitTests
         [TestCase("int main() {}", CursorKind.FunctionDecl, "main", Type.Kind.Int)]
         public void testGetAST(string code, CursorKind fstChildKind, string fstChildSpelling, Type.Kind fstChildTypeKind)
         {
-            Cursor root = getAST(code);
+            Cursor root = getWrapper(code).getRoot();
 
             Assert.AreEqual(CursorKind.TranslationUnit, root.Kind);
             Assert.AreEqual(fstChildKind, root.Children[0].Kind);
@@ -75,18 +83,49 @@ namespace ExplanationGenerator.UnitTests
             deleteTemplateFiles();
         }
 
-        [TestCase("en", "void func() { }", "func void () []")]
-        [TestCase("zh", "void func() { }", "func void () []")]
-        [TestCase("en", "void func(int a) { }", "func void [a ] []")]
+        [TestCase("en", "void func() { }", "func Void |[] |[]")]
+        [TestCase("zh", "void func() { }", "func Void |[] |[]")]
+        [TestCase("en", "void func(int a) { }", "func Void |[a Int] |[]")]
+        [TestCase("en", "void func(char a) { }", "func Void |[a Char] |[]")]
+        [TestCase("en", "void func(short a) { }", "func Void |[a Short] |[]")]
+        [TestCase("en", "void func(long a) { }", "func Void |[a Long] |[]")]
+        [TestCase("en", "void func(float a) { }", "func Void |[a Float] |[]")]
+        [TestCase("en", "void func(double a) { }", "func Void |[a Double] |[]")]
+        [TestCase("en", "void func(int a, double b) { }", "func Void |[a Int|b Double] |[]")]
+        [TestCase("en", "void func(int a, double b, char c) { }", "func Void |[a Int|b Double|c Char] |[]")]
+        [TestCase("zh", "void func() {int a;}", "func Void |[] |[a Int ]")]
         public void testTranslateFunctionDecl(string languageCode, string code, string expectedTranslation)
         {
             createTemplateFiles();
 
             Translator translator = new Translator(languageCode, "");
-            Cursor root = getAST(code);
+            ClangWrapper wrapper = getWrapper(code);
+            Cursor root = wrapper.getRoot();
+            TranslationUnit tu = wrapper.getTranslationUnit();
             Cursor functionDecl = root.Children[0];
 
-            string translation = translator.translateFunctionDecl(functionDecl);
+            string translation = translator.translateFunctionDecl(functionDecl, tu);
+
+            Assert.AreEqual(expectedTranslation, translation);
+
+            deleteTemplateFiles();
+        }
+
+        [TestCase("en", "int a;", "a Int ", 0)]
+        [TestCase("en", "int a = 0;", "a Int 0", 0)]
+        [TestCase("en", "int a = 12;", "a Int 12", 0)]
+        [TestCase("en", "int b; int a = b;", "a Int b", 1)]
+        public void testTranslateVarDecl(string languageCode, string code, string expectedTranslation, int child)
+        {
+            createTemplateFiles();
+
+            Translator translator = new Translator(languageCode, "");
+            ClangWrapper wrapper = getWrapper(code);
+            Cursor root = wrapper.getRoot();
+            TranslationUnit tu = wrapper.getTranslationUnit();
+            Cursor varDecl = root.Children[child];
+
+            string translation = translator.translateVarDecl(varDecl, tu);
 
             Assert.AreEqual(expectedTranslation, translation);
 
