@@ -121,9 +121,9 @@ namespace ExplanationGenerator.UnitTests
             ClangWrapper wrapper = getWrapper(code);
             Cursor root = wrapper.getRoot();
             TranslationUnit tu = wrapper.getTranslationUnit();
-            Cursor varDecl = root.Children[childIndex];
+            Cursor child = root.Children[childIndex];
 
-            string translation = translator.translateVarDecl(varDecl, tu);
+            string translation = translator.translate(child, tu);
 
             Assert.AreEqual(expectedTranslation, translation);
 
