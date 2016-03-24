@@ -21,31 +21,82 @@ namespace ExplanationGenerator
         }
 
         /*
-            Translate from a Cursor, will call specific methods depends on the type of cursor.
+            Translate from a Cursor, will call specific methods depending on the type of cursor.
         */
         public string translate(Cursor unknownCursor, TranslationUnit tu)
         {
+            if (unknownCursor.IsExpression)
+            {
+                return translateExpr(unknownCursor, tu);
+            }
+
             switch (unknownCursor.Kind)
             {
                 case CursorKind.FunctionDecl:
                     return translateFunctionDecl(unknownCursor, tu);
-                case CursorKind.IntegerLiteral:
-                    return translateIntegerLiteral(unknownCursor, tu);
-                case CursorKind.UnexposedExpr:
-                    return translateUnexposedExpr(unknownCursor, tu);
+                case CursorKind.DeclStmt:
+                    return translateDeclStmt(unknownCursor, tu);
                 default:
                     return "";
             }
         }
 
-        internal string translateUnexposedExpr(Cursor unexposedExpr, TranslationUnit tu)
+        /*
+            Translate a Cursor, assuming it is an expression.
+        */
+        internal string translateExpr(Cursor expr, TranslationUnit tu)
         {
-
-            if (unexposedExpr.Children.Count > 0 && unexposedExpr.Children[0].Kind == CursorKind.DeclRefExpr)
+            switch (expr.Kind)
             {
-                return unexposedExpr.Children[0].Spelling;
+                case CursorKind.UnexposedExpr:
+                    return translateUnexposedExpr(expr, tu);
+
+                case CursorKind.DeclRefExpr:
+                    return expr.Spelling;
+
+                case CursorKind.IntegerLiteral:
+                case CursorKind.FloatingLiteral:
+                case CursorKind.CharacterLiteral:
+                    return translateLiteral(expr, tu);
+
+                default:
+                    return "";
+            }
+        }
+
+        internal string translateDeclStmt(Cursor declStmt, TranslationUnit tu)
+        {
+            if (declStmt.Children.Count > 0)
+            {
+                switch (declStmt.Children[0].Kind)
+                {
+                    case CursorKind.VarDecl:
+                        return translateVarDecl(declStmt.Children[0], tu);
+                }
             }
             return "";
+        }
+
+        internal string translateUnexposedExpr(Cursor unexposedExpr, TranslationUnit tu)
+        {
+            string result = "";
+            for (int i = 0; i < unexposedExpr.Children.Count; i++)
+            {
+                if (unexposedExpr.Children[i].IsExpression)
+                {
+                    result += translateExpr(unexposedExpr.Children[i], tu);
+                    if (i < unexposedExpr.Children.Count - 1)
+                    {
+                        result += "|";
+                    }
+                }
+            }
+            return result;
+        }
+
+        internal string translateDeclRefExpr(Cursor DeclRefExpr, TranslationUnit tu)
+        {
+            return DeclRefExpr.Spelling;
         }
 
         internal string translateFunctionDecl(Cursor functionDecl, TranslationUnit tu)
@@ -60,13 +111,14 @@ namespace ExplanationGenerator
             }
             Cursor[] paramList = new Cursor[paramCount];
 
-            for (int i = 0; i < functionDecl.Children.Count && functionDecl.Children[i].Kind != CursorKind.CompoundStmt; i++)
+            int index;
+            for (index = 0; index < functionDecl.Children.Count && functionDecl.Children[index].Kind != CursorKind.CompoundStmt; index++)
             {
-                paramList[i] = functionDecl.Children[i];
+                paramList[index] = functionDecl.Children[index];
             }
 
             string functionArguments = translateParamList(paramList, tu);
-            string functionBody = translateCompoundStmt(functionDecl, tu);
+            string functionBody = translateCompoundStmt(functionDecl.Children[index], tu);
             return String.Format(cursorDictionary[functionDecl.Kind], functionName, functionReturnType, functionArguments, functionBody);
         }
 
@@ -75,14 +127,14 @@ namespace ExplanationGenerator
             string result = "";
             int childCount = compoundStmt.Children.Count;
 
-            //for (int i = 0; i < childCount; i++)
-            //{
-            //    result += translate(compoundStmt.Children[i], tu);
-            //    if (i < childCount - 1)
-            //    {
-            //        result += "|";
-            //    }
-            //}
+            for (int i = 0; i < childCount; i++)
+            {
+                result += translate(compoundStmt.Children[i], tu);
+                if (i < childCount - 1)
+                {
+                    result += "|";
+                }
+            }
 
             return result;
         }
@@ -128,13 +180,13 @@ namespace ExplanationGenerator
             {
                 varValue = translate(varDecl.Children[0], tu);
             }
-            
+
             return String.Format(cursorDictionary[varDecl.Kind], varName, varType, varValue);
         }
 
-        internal string translateIntegerLiteral(Cursor integerLit, TranslationUnit tu)
+        internal string translateLiteral(Cursor literal, TranslationUnit tu)
         {
-            return tu.GetText(integerLit.Extent);
+            return tu.GetText(literal.Extent);
         }
 
         /*

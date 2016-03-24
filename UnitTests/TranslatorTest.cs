@@ -94,6 +94,7 @@ namespace ExplanationGenerator.UnitTests
         [TestCase("en", "void func(int a, double b) { }", "func Void |[a Int|b Double] |[]")]
         [TestCase("en", "void func(int a, double b, char c) { }", "func Void |[a Int|b Double|c Char] |[]")]
         [TestCase("zh", "void func() {int a;}", "func Void |[] |[a Int ]")]
+        [TestCase("zh", "void func() {int a; double b = a;}", "func Void |[] |[a Int |b Double a]")]
         public void testTranslateFunctionDecl(string languageCode, string code, string expectedTranslation)
         {
             createTemplateFiles();
@@ -111,10 +112,14 @@ namespace ExplanationGenerator.UnitTests
             deleteTemplateFiles();
         }
 
-        [TestCase("en", "int a;", "a Int ", 0)]
-        [TestCase("en", "int a = 0;", "a Int 0", 0)]
-        [TestCase("en", "int a = 12;", "a Int 12", 0)]
-        [TestCase("en", "int b; int a = b;", "a Int b", 1)]
+        [TestCase("en", @"int a;", "a Int ", 0)]
+        [TestCase("en", @"int a = 0;", "a Int 0", 0)]
+        [TestCase("en", @"int a = 12;", "a Int 12", 0)]
+        [TestCase("en", @"int b; int a = b;", "a Int b", 1)]
+        [TestCase("en", @"double b = 1.2;", "b Double 1.2", 0)]
+        [TestCase("en", @"char c = 'a';", "c Char 'a'", 0)]
+        [TestCase("en", @"float f = 2.1;", "f Float 2.1", 0)]
+        [TestCase("en", @"long l = 210000;", "l Long 210000", 0)]
         public void testTranslateVarDecl(string languageCode, string code, string expectedTranslation, int child)
         {
             createTemplateFiles();
