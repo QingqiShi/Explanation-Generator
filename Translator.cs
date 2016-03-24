@@ -29,16 +29,16 @@ namespace ExplanationGenerator
             {
                 return translateExpr(unknownCursor, tu);
             }
-
-            switch (unknownCursor.Kind)
+            else if (unknownCursor.IsStatement)
             {
-                case CursorKind.FunctionDecl:
-                    return translateFunctionDecl(unknownCursor, tu);
-                case CursorKind.DeclStmt:
-                    return translateDeclStmt(unknownCursor, tu);
-                default:
-                    return "";
+                return translateStmt(unknownCursor, tu);
             }
+            else if (unknownCursor.IsDeclaration)
+            {
+                return translateDecl(unknownCursor, tu);
+            }
+
+            return "";
         }
 
         /*
@@ -64,14 +64,45 @@ namespace ExplanationGenerator
             }
         }
 
+        /*
+            Translate a Cursor, assuming it is a statement.
+        */
+        internal string translateStmt(Cursor stmt, TranslationUnit tu)
+        {
+            switch (stmt.Kind)
+            {
+                case CursorKind.DeclStmt:
+                    return translateDeclStmt(stmt, tu);
+
+                default:
+                    return "";
+            }
+        }
+
+        /*
+            Translate a Cursor, assuming it is a declaration.
+        */
+        internal string translateDecl(Cursor decl, TranslationUnit tu)
+        {
+            switch (decl.Kind)
+            {
+                case CursorKind.FunctionDecl:
+                    return translateFunctionDecl(decl, tu);
+                case CursorKind.VarDecl:
+                    return translateVarDecl(decl, tu);
+
+                default:
+                    return "";
+            }
+        }
+
         internal string translateDeclStmt(Cursor declStmt, TranslationUnit tu)
         {
             if (declStmt.Children.Count > 0)
             {
-                switch (declStmt.Children[0].Kind)
+                if (declStmt.Children[0].IsDeclaration)
                 {
-                    case CursorKind.VarDecl:
-                        return translateVarDecl(declStmt.Children[0], tu);
+                    return translateDecl(declStmt.Children[0], tu);
                 }
             }
             return "";

@@ -97,19 +97,7 @@ namespace ExplanationGenerator.UnitTests
         [TestCase("zh", "void func() {int a; double b = a;}", "func Void |[] |[a Int |b Double a]")]
         public void testTranslateFunctionDecl(string languageCode, string code, string expectedTranslation)
         {
-            createTemplateFiles();
-
-            Translator translator = new Translator(languageCode, "");
-            ClangWrapper wrapper = getWrapper(code);
-            Cursor root = wrapper.getRoot();
-            TranslationUnit tu = wrapper.getTranslationUnit();
-            Cursor functionDecl = root.Children[0];
-
-            string translation = translator.translateFunctionDecl(functionDecl, tu);
-
-            Assert.AreEqual(expectedTranslation, translation);
-
-            deleteTemplateFiles();
+            assertCodeWithTranslation(languageCode, code, expectedTranslation, 0);
         }
 
         [TestCase("en", @"int a;", "a Int ", 0)]
@@ -122,13 +110,18 @@ namespace ExplanationGenerator.UnitTests
         [TestCase("en", @"long l = 210000;", "l Long 210000", 0)]
         public void testTranslateVarDecl(string languageCode, string code, string expectedTranslation, int child)
         {
+            assertCodeWithTranslation(languageCode, code, expectedTranslation, child);
+        }
+
+        private void assertCodeWithTranslation(string languageCode, string code, string expectedTranslation, int childIndex)
+        {
             createTemplateFiles();
 
             Translator translator = new Translator(languageCode, "");
             ClangWrapper wrapper = getWrapper(code);
             Cursor root = wrapper.getRoot();
             TranslationUnit tu = wrapper.getTranslationUnit();
-            Cursor varDecl = root.Children[child];
+            Cursor varDecl = root.Children[childIndex];
 
             string translation = translator.translateVarDecl(varDecl, tu);
 
