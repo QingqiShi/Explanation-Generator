@@ -73,6 +73,10 @@ namespace ExplanationGenerator
             {
                 case CursorKind.DeclStmt:
                     return translateDeclStmt(stmt, tu);
+                case CursorKind.IfStmt:
+                    return translateIfStmt(stmt, tu);
+                case CursorKind.CompoundStmt:
+                    return translateCompoundStmt(stmt, tu);
 
                 default:
                     return "";
@@ -106,6 +110,26 @@ namespace ExplanationGenerator
                 }
             }
             return "";
+        }
+
+        internal string translateIfStmt(Cursor ifStmt, TranslationUnit tu)
+        {
+            string condition = "";
+            string body = "";
+            string elseBranch = "";
+
+            if (ifStmt.Children.Count >= 2)
+            {
+                condition = translateExpr(ifStmt.Children[0], tu);
+                body = translateStmt(ifStmt.Children[1], tu);
+            }
+
+            if (ifStmt.Children.Count >= 3)
+            {
+                elseBranch = translateStmt(ifStmt.Children[2], tu);
+            }
+
+            return String.Format(cursorDictionary[ifStmt.Kind], condition, body, elseBranch);
         }
 
         internal string translateUnexposedExpr(Cursor unexposedExpr, TranslationUnit tu)
@@ -256,6 +280,8 @@ namespace ExplanationGenerator
                     return CursorKind.ParmDecl;
                 case "VarDecl":
                     return CursorKind.VarDecl;
+                case "IfStmt":
+                    return CursorKind.IfStmt;
             }
             return 0;
         }

@@ -52,6 +52,7 @@ namespace ExplanationGenerator.UnitTests
             sw.WriteLine("FunctionDecl::{0} {1} |[{2}] |[{3}]");
             sw.WriteLine("ParmDecl::{0} {1}");
             sw.WriteLine("VarDecl::{0} {1} {2}");
+            sw.WriteLine("IfStmt::{0} |[{1}] |[{2}]");
         }
 
         private void deleteTemplateFiles()
@@ -79,6 +80,23 @@ namespace ExplanationGenerator.UnitTests
             createTemplateFiles();
 
             Translator translator = new Translator(languageCode, "");
+
+            deleteTemplateFiles();
+        }
+
+        private void assertCodeWithTranslation(string languageCode, string code, string expectedTranslation, int childIndex)
+        {
+            createTemplateFiles();
+
+            Translator translator = new Translator(languageCode, "");
+            ClangWrapper wrapper = getWrapper(code);
+            Cursor root = wrapper.getRoot();
+            TranslationUnit tu = wrapper.getTranslationUnit();
+            Cursor child = root.Children[childIndex];
+
+            string translation = translator.translate(child, tu);
+
+            Assert.AreEqual(expectedTranslation, translation);
 
             deleteTemplateFiles();
         }
@@ -113,21 +131,18 @@ namespace ExplanationGenerator.UnitTests
             assertCodeWithTranslation(languageCode, code, expectedTranslation, child);
         }
 
-        private void assertCodeWithTranslation(string languageCode, string code, string expectedTranslation, int childIndex)
+        [TestCase("en", @"void func() { 
+                              if (1) {int a;} 
+                          }", "func Void |[] |[1 |[a Int ] |[]]")]
+        [TestCase("en", @"void func() { 
+                              if (1) {int a;} else {int b;}
+                          }", "func Void |[] |[1 |[a Int ] |[b Int ]]")]
+        [TestCase("en", @"void func() { 
+                              if (1) {int a;} else if (0) {int b;}
+                          }", "func Void |[] |[1 |[a Int ] |[0 |[b Int ] |[]]]")]
+        public void testTranslateIfStmt(string languageCode, string code, string expectedTranslation)
         {
-            createTemplateFiles();
-
-            Translator translator = new Translator(languageCode, "");
-            ClangWrapper wrapper = getWrapper(code);
-            Cursor root = wrapper.getRoot();
-            TranslationUnit tu = wrapper.getTranslationUnit();
-            Cursor child = root.Children[childIndex];
-
-            string translation = translator.translate(child, tu);
-
-            Assert.AreEqual(expectedTranslation, translation);
-
-            deleteTemplateFiles();
+            assertCodeWithTranslation(languageCode, code, expectedTranslation, 0);
         }
     }
 }
