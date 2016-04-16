@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.scene.web.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane minHeight="600.0" minWidth="800.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ControllerLoader">
+   <top>
+      <HBox minHeight="100.0" prefHeight="40.0" prefWidth="800.0" spacing="20.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="40.0" prefWidth="615.0">
+               <children>
+                  <TextField fx:id="pathTextField" focusTraversable="false" onKeyReleased="#pathTextFieldOnKeyTyped" onKeyTyped="#pathTextFieldOnKeyTyped" prefHeight="40.0" prefWidth="574.0" promptText="Path to your source code file" />
+                  <Button mnemonicParsing="false" onAction="#browseButtonHandler" prefHeight="40.0">
+                     <graphic>
+                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@OPEN_ICON.png" />
+                           </image>
+                        </ImageView>
+                     </graphic></Button>
+               </children>
+            </HBox>
+            <Button fx:id="languageButton" mnemonicParsing="false" onAction="#langButtonHandler" prefHeight="40.0" prefWidth="46.0">
+               <graphic>
+                  <ImageView fx:id="langButtonIcon" fitHeight="30.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@ZH_ICON.png" />
+                     </image>
+                  </ImageView>
+               </graphic></Button>
+            <Button fx:id="goButton" disable="true" mnemonicParsing="false" onAction="#goButtonHandler" prefHeight="40.0" prefWidth="54.0">
+               <graphic>
+                  <ImageView fx:id="goButtonIcon" fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@GO_ICON.png" />
+                     </image>
+                  </ImageView>
+               </graphic></Button>
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="15.0" right="15.0" top="30.0" />
+         </padding>
+      </HBox>
+   </top>
+   <center>
+      <WebView fx:id="resultWebView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </center>
+</BorderPane>

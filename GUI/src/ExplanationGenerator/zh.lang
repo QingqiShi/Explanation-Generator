@@ -1,0 +1,11 @@
+int::整数
+char::字符
+short int::短整数
+long int::长整数
+double::双精度浮点
+float::浮点型
+void::空
+FunctionDecl::声明函数{0}, 返回类型为{1}, 参数为:[{2}]函数主体：[{3}]
+ParmDecl::{1} {0}
+VarDecl::声明{1}变量 {0}，赋值为 {2}
+IfStmt::如果 {0}, 则 [{1}]否则 [{2}]

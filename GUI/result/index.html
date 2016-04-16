@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Explanations</title>
+	<link rel = "stylesheet" href="./highlight/styles/dracula.css">
+	<script src = "./highlight/highlight.pack.js" ></script>
+
+	<style media="screen">
+	body {
+		background: #cecece;
+		margin: 0;
+		padding: 0;
+	}
+	.hljs {
+		padding: 1em;
+		overflow-y: auto;
+		overflow-x: hidden;
+		line-height: 1.5;
+	}
+	pre {
+		margin: 0;
+	}
+	pre code
+	{
+		font: normal 10pt Consolas, Monaco, monospace;
+		min-height: 100vh;
+	}
+	.source_code {
+		width: 50%;
+		float: left;
+	}
+	.explanations {
+		width: 50%;
+		float: right;
+	}
+    .explanations pre {
+        white-space: normal;
+    }
+	.explanations pre code {
+		background: #cecece;
+		color: #000000;
+		padding: 0 1em 0 1em;
+	}
+	.indent {
+		margin-left: 2em;
+		padding: 1px 1px 1px 2px;
+		background-color: rgba(255,255,255,0.4);
+	}
+	</style>
+
+	<script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+	<div class="container">
+		<div class="source_code">
+			<pre><code class="cpp">void func(int c) {
+	if (1) {
+		int b = c;
+	} else {
+		char b = 'h';
+	}
+	char a = 5;
+}</code></pre>
+		</div>
+		<div class="explanations">
+			<pre><code>Declare function func, returns Void, argument list:<div class="indent">c as a Integer</div>Body of function:<div class="indent">If 1, then: <div class="indent">Declare variable b as a Integer，initialise to c</div>Else: <div class="indent">Declare variable b as a Char，initialise to 'h'</div><br>Declare variable a as a Char，initialise to 5</div></code></pre>
+		</div>
+	</div>
+</body>
+</html>

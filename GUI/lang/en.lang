@@ -1,0 +1,11 @@
+int::Integer
+char::Char
+short int::Short
+long int::Long
+double::Double
+float::Float
+void::Void
+FunctionDecl::Declare function {0}, returns {1}, argument list:[{2}]Body of function:[{3}]
+ParmDecl::{0} as a {1}
+VarDecl::Declare variable {0} as a {1}，initialise to {2}
+IfStmt::If {0}, then: [{1}]Else: [{2}]
