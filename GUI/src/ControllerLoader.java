@@ -35,10 +35,10 @@ public class ControllerLoader {
 
 		resultWebView.getEngine().load(getClass().getResource("defaultPage.html").toString());
 	}
-	
+
 	public void setLanguage(String lang) {
 		this.lang = lang;
-		
+
 		switch (lang) {
 		case "zh":
 			langButtonIcon.setImage(new Image(getClass().getResource("ZH_ICON.png").toString()));
@@ -68,6 +68,8 @@ public class ControllerLoader {
 	@FXML
 	void goButtonHandler(ActionEvent event) {
 		String workingDir = System.getProperty("user.dir");
+		File f = new File(pathTextField.getText());
+		if (f.exists()) {
 		try {
 			Process process = new ProcessBuilder(workingDir + "\\core\\ExplanationGenerator.exe",
 					workingDir + "\\lang\\", pathTextField.getText(),
@@ -80,6 +82,8 @@ public class ControllerLoader {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}} else {
+			Main.showError("The file you selected doesn't exist!");
 		}
 	}
 
@@ -87,12 +91,12 @@ public class ControllerLoader {
 	void pathTextFieldOnKeyTyped() {
 		checkPathTextField();
 	}
-	
+
 	@FXML
 	void langButtonHandler(ActionEvent event) {
 		main.showLanguage();
 	}
-	
+
 	void checkPathTextField() {
 		pathEmpty = pathTextField.getText().equals("");
 		goButton.setDisable(pathEmpty);

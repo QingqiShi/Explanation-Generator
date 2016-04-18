@@ -6,7 +6,7 @@ import javafx.scene.control.ListView;
 
 public class ControllerLanguage {
 	private static final String EN = "English - UK";
-	private static final String ZH = "¼òÌåÖĞÎÄ";
+	private static final String ZH = "ç®€ä½“ä¸­æ–‡";
 
 	@FXML
 	ListView<String> languageListView;
