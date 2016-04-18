@@ -54,15 +54,17 @@
 <body>
 	<div class="container">
 		<div class="source_code">
-			<pre><code class="cpp">void func() {
+			<pre><code class="cpp">void func(int c) {
 	if (1) {
+		int b = c;
 	} else {
+		char b = 'h';
 	}
-	int a = 5;
+	char a = 5;
 }</code></pre>
 		</div>
 		<div class="explanations">
-			<pre><code>Declare function func, returns Void, argument list:<div class="indent"></div>Body of function:<div class="indent">If 1, then: <div class="indent"></div>Else: <div class="indent"></div><br>Declare variable a as a Integer，initialise to 5</div></code></pre>
+			<pre><code>Declare function func, returns Void, argument list:<div class="indent">c as a Integer</div>Body of function:<div class="indent">If 1, then: <div class="indent">Declare variable b as a Integer，initialise to c</div>Else: <div class="indent">Declare variable b as a Char，initialise to 'h'</div><br>Declare variable a as a Char，initialise to 5</div></code></pre>
 		</div>
 	</div>
 </body>
